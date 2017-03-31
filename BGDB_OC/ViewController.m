@@ -67,17 +67,17 @@
     /**
      忽略某些属性不要更新(条件语句跟sqlite原生的一样).
      */
-    //[p updateWhere:@"where age=26 and dog.name='二哈111'" ignoredkeys:nil];
+    //[p updateWhere:@"where age=26 and dog.name='二哈111'" ignoredkeys:@[@"name",@"dog.name",@"dog.age"]];
+    
+    /**
+     sql语句批量更新设置.
+     */
+    //[People updateSet:@"set name='黄芝标' where age=26"];
     
     /**
      条件查询(条件语句跟sqlite原生的一样).
      */
     //NSArray* pSome = [People findWhere:@"where age=26 or dog.name='二哈-------'"];
-    
-    /**
-     sql语句批量更新设置.
-     */
-    //[People updateSet:@"set name='黄芝标' where age=26"];//
     
     /**
      条件删除(条件语句跟sqlite原生的一样).
