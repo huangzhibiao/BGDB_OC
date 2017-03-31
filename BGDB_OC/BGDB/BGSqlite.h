@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BGTool.h"
 
 @interface BGSqlite : NSObject
 @property(nonatomic,assign)BOOL debug;

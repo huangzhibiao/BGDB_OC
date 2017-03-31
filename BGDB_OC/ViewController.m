@@ -26,7 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [People setDebug:YES];
+    [People setDebug:NO];
     People* p = [People new];
     p.fa = YES;
     p.name = @"黄芝标";
@@ -88,6 +88,9 @@
      查询全部.
      */
     NSArray* pAll = [People findAll];
+    for(People* p in pAll){
+        NSLog(@"主键ID = %@",p.ID);
+    }
     People* lastOne = pAll.lastObject;
     _imageView.image = p.array.lastObject;
     NSLog(@"----");

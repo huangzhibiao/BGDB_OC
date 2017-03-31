@@ -8,8 +8,6 @@
 
 #import "BGSqlite.h"
 #import <sqlite3.h>
-#import "BGTool.h"
-#import "BGModelInfo.h"
 
 /**
  日志输出.
@@ -801,19 +799,17 @@ int FMDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
         }];
         
         NSString* tableName = NSStringFromClass(cla);
-        if((sqlKeys.count==0) && (newKeys.count>0)){NSLog(@"添加新字段...");
+        if((sqlKeys.count==0) && (newKeys.count>0)){//NSLog(@"添加新字段...");
             //此处只是增加了新的列.
             for(NSString* key in newKeys){
                 //添加新字段
                 NSString* SQL = [NSString stringWithFormat:@"alter table %@ add %@;",tableName,key];
                 [self execSql:SQL];
             }
-        }else if (sqlKeys.count>0){NSLog(@"数据库刷新....");
+        }else if (sqlKeys.count>0){//NSLog(@"数据库刷新....");
             //字段发生改变,减少或名称变化,实行刷新数据库.
             [self refresh:cla ignoredKeys:ignoredKeys];//进行刷新处理.
-        }else{
-            NSLog(@"无更新操作......");
-        }
+        }else;
     }
 }
 
