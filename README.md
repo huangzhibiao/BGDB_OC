@@ -5,13 +5,13 @@ BGFMDB是在FMDB的基础上进行封装,由于多了中间一层的转化,所�
 # 使用说明.
 ## CocoaPods方式
 ### Podfile
-platform :ios, '8.0'
-target '工程名称' do
-pod ‘BGDB_OC’, '~> 1.1’
+platform :ios, '8.0'   
+target '工程名称' do   
+pod ‘BGDB_OC’, '~> 1.1’   
 end
 ## 手动导入
-1.直接下载库源码
-2.添加所需依赖库：libsqlite3
+1.直接下载库源码   
+2.添加所需依赖库：libsqlite3   
 ## 导入头文件
 ```Objective-C
 /**
