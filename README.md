@@ -3,6 +3,12 @@ BGFMDB是在FMDB的基础上进行封装,由于多了中间一层的转化,所�
 # swift版正在着手计划中,用swift的同学们,请拭目以待😊.
 ## 功能和BGFMDB基本相同,完美支持大部分数据类型的存储.
 # 使用说明.
+## CocoaPods方式
+### Podfile
+platform :ios, '8.0'
+target '工程名称' do
+pod ‘BGDB_OC’, '~> 1.1’
+end
 ## 手动导入
 1.直接下载库源码
 2.添加所需依赖库：libsqlite3
