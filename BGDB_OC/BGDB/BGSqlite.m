@@ -191,8 +191,8 @@ static sqlite3* BG_Database;
     return [NSString stringWithFormat:@"%@%@_v%@.sqlite",CacheDir,tableName,@(version)];
     
 }
-int FMDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values, char **names);
-int FMDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values, char **names) {
+int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values, char **names);
+int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values, char **names) {
     
     if (!theBlockAsVoid) {
         return SQLITE_OK;
@@ -230,7 +230,7 @@ int FMDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
     }
     char *errmsg = nil;
     BGDebug(SQL)
-    sqlite3_exec(BG_Database, [SQL UTF8String], block ? FMDBExecuteBulkSQLCallback : nil, (__bridge void *)(block), &errmsg);
+    sqlite3_exec(BG_Database, [SQL UTF8String], block ? BGDBExecuteBulkSQLCallback : nil, (__bridge void *)(block), &errmsg);
     if (errmsg) {
         NSString* sqlError = [NSString stringWithFormat:@"Error inserting batch: %s", errmsg];
         BGDebug(sqlError)
