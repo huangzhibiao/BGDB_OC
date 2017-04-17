@@ -27,6 +27,8 @@
  @ignoredKeys 存放忽略key值的数组.
  */
 +(BOOL)insert:(id)object ignoredKeys:(NSArray* const)ignoredKeys;
++(BOOL)insertOrUpdate:(id)object;
++(BOOL)insertOrUpdate:(id)object ignoredKeys:(NSArray* const)ignoredKeys;
 /**
  批量插入.
  @array 存放对象的数组.
@@ -63,4 +65,8 @@
  删除类对应的数据库.
  */
 +(BOOL)dropWithClass:(Class)model_class;
+/**
+ 刷新数据库版本.
+ */
++(void)refresh:(Class)cla ignoredKeys:(NSArray*)ignoredKeys;
 @end

@@ -10,6 +10,10 @@
 
 @implementation father
 
+//+(NSArray *)uniqueKeys{
+//    return @[@"fa"];
+//}
+
 @end
 
 @implementation Cat
@@ -31,8 +35,8 @@
 /**
  想要定义'唯一约束',实现该函数返回相应的key即可.
  */
-//+(NSArray *)uniqueKeys{
-//    return @[@"name"];
-//}
++(NSArray *)uniqueKeys{
+    return @[@"name"];
+}
 
 @end

@@ -47,6 +47,17 @@
  */
 -(BOOL)saveIgnoredkeys:(NSArray* const)ignorekeys;
 /**
+ 存储.
+ 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+ */
+-(BOOL)saveOrUpdate;
+/**
+ 存储.
+ 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+ @ignoredkeys 忽略某些属性不要存.
+ */
+-(BOOL)saveOrUpdate:(NSArray* const)ignorekeys;
+/**
  批量存储.
  */
 +(BOOL)saveArray:(NSArray* const)array;
@@ -85,6 +96,17 @@
  删除数据库.
  */
 +(BOOL)drop;
+/**
+ 获取数据库版本号.
+ 为了防止发生函数名冲突,所以加上bg_前缀.
+ */
++(NSInteger)bg_version;
+/**
+ 更新数据库.
+ 当'唯一约束'发生改变时,调用此API进行数据库更新升级.
+ 注：本次更新的版本号要大于现有的版本号,否则不做升级.
+ */
++(void)updateVersion:(NSInteger)version;
 
 #pragma mark 下面附加字典转模型API,简单好用,在只需要字典转模型功能的情况下,可以不必要再引入MJExtension那么多文件,造成代码冗余,缩减安装包.
 /**

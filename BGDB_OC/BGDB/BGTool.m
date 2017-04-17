@@ -297,6 +297,10 @@ static NSSet *foundationClasses_;
             id propertyValue = [object valueForKey:propertyName];
             if (propertyValue){
                 id Value = [self getSqlValue:propertyValue properInfo:properInfo encode:YES];
+                //特殊处理数组自定义类中的二进制数据类型.
+                if((properInfo.type==BG_Data) || (properInfo.type==BG_UIImage)){
+                    Value = [Value base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+                }
                 keyValueDict[propertyName] = Value;
             }
         }
@@ -605,6 +609,38 @@ static NSSet *foundationClasses_;
 }
 
 /**
+ 处理组数嵌套类中二进制类型.
+ */
++(id)objectFromArrayJsonStringWithClassName:(NSString*)claName valueDict:(NSDictionary*)valueDict{
+    Class cla = NSClassFromString(claName);
+    id object = [BGTool getObjectWithClass:cla];
+    NSArray* keyAndTypes = [self getClassIvarList:cla];
+    [valueDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id _Nonnull value, BOOL * _Nonnull stop1){
+        id __block tempValue = value;
+        [keyAndTypes enumerateObjectsUsingBlock:^(BGPropertyInfo* _Nonnull properInfo, NSUInteger idx, BOOL * _Nonnull stop2) {
+            if ([key isEqualToString:properInfo.name]){
+                id ivarValue;
+                //特殊处理数组自定义类中的二进制数据类型.
+                if((properInfo.type==BG_Data) || (properInfo.type==BG_UIImage)){
+                   tempValue = [[NSData alloc] initWithBase64EncodedString:value options:NSDataBase64DecodingIgnoreUnknownCharacters];
+                }
+                ivarValue = [self getSqlValue:tempValue properInfo:properInfo encode:NO];
+                if([key containsString:BG_PropertySeparator]){
+                    NSString* keyPath = [properInfo.name stringByReplacingOccurrencesOfString:BG_PropertySeparator withString:@"."];
+                    [object setValue:ivarValue forKeyPath:keyPath];
+                }else{
+                    [object setValue:ivarValue forKey:properInfo.name];
+                }
+                *stop2 = YES;;//匹配处理完后跳出内循环.
+            }
+        }];
+    }];
+    
+    return object;
+
+}
+
+/**
  字典或json格式字符转模型用的处理函数.
  */
 +(id)objectWithClass:(__unsafe_unretained _Nonnull Class)cla value:(id)value{
@@ -667,7 +703,7 @@ static NSSet *foundationClasses_;
     }else if ([key containsString:BG_Model]){
         NSString* claName = [key componentsSeparatedByString:@"*"].lastObject;
         NSDictionary* valueDict = [self jsonWithString:dictionary[key]];
-        id object = [self objectFromJsonStringWithClassName:claName valueDict:valueDict];
+        id object = [self objectFromArrayJsonStringWithClassName:claName valueDict:valueDict];
         return object;
     }else{
         NSAssert(NO,@"没有找到匹配的解析类型");
@@ -793,6 +829,20 @@ static NSSet *foundationClasses_;
     }
     return dict;
 }
+/**
+ 判断类是否实现了某个类方法.
+ */
++(id)isRespondsToSelector:(SEL)selector forClass:(Class)cla{
+    id obj = nil;
+    if([cla respondsToSelector:selector]){
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        obj = [cla performSelector:selector];
+#pragma clang diagnostic pop
+    }
+    return obj;
+}
+
 +(BOOL)getBoolWithKey:(NSString*)key{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:key];

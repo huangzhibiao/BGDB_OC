@@ -26,9 +26,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [People setDebug:NO];
+    [People setDebug:YES];
     People* p = [People new];
     p.fa = YES;
+    p.aId = @"100";
     p.name = @"黄芝标";
     p.age = 28;
     p.f = 1.2;
@@ -39,11 +40,12 @@
     dog.name = @"二哈-------";
     dog.sex = @"男";
     dog.age = 10;
+    dog.image = p.image;
     dog.BGCreateTime = @"2016-23-12 21:32:12";
     dog.BGUpdateTime = @"2016-23-12 21:32:12";
     
     Cat* cat = [Cat new];
-    cat.name = @"蓝猫";
+    cat.name = @"蓝猫1";
     
     p.dog = dog;
     
@@ -52,7 +54,7 @@
     /**
      存储.
      */
-    [p save];
+    [p saveOrUpdate];
     
     /**
      忽略某些属性存储.

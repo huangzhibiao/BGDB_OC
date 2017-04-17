@@ -11,7 +11,7 @@
 #import "NSObject+BGModel.h"
 
 @interface father : NSObject
-
+@property(nonatomic,copy)NSString* aId;
 @property(nonatomic,assign)BOOL fa;
 
 @end
@@ -24,6 +24,7 @@
 @property (nonatomic, copy) NSString * name;
 @property (nonatomic, copy) NSString* sex;
 @property (nonatomic, assign) int age;
+@property(nonatomic,strong)UIImage* image;
 @property (nonatomic, copy) NSString * BGCreateTime;
 @property (nonatomic, copy) NSString * BGUpdateTime;
 //@property(nonatomic,strong)UIImage* image;

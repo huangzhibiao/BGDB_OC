@@ -96,6 +96,10 @@ typedef void (^BGClassesEnumeration)(Class c, BOOL *stop);
                    finally:(void(^)())block;
 +(BGPropertyInfo*)getProperInfoForCla:(__unsafe_unretained Class)cla Name:(NSString*)name type:(NSString*)type;
 /**
+ 判断类是否实现了某个类方法.
+ */
++(id)isRespondsToSelector:(SEL)selector forClass:(Class)cla;
+/**
  NSUserDefaults封装使用函数.
  */
 +(BOOL)getBoolWithKey:(NSString*)key;

@@ -398,6 +398,50 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 
 }
 
++(BOOL)insertOrUpdate:(id)object{
+    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"uniqueKeys") forClass:[object class]];
+    if(uniqueKeys.count) {
+        NSString* uniqueKey = uniqueKeys.firstObject;
+        id value = [object valueForKey:uniqueKey];
+        NSString* where;
+        if([value isKindOfClass:[NSString class]]){
+            where = [NSString stringWithFormat:@"where %@='%@'",uniqueKey,value];
+        }else{
+            where = [NSString stringWithFormat:@"where %@=%@",uniqueKey,value];
+        }
+        NSArray* querys = [self queryWithClass:[object class] where:where];
+        if(querys.count){
+            return [self updateObj:object where:where];
+        }else{
+            return [self insert:object];
+        }
+    }else{
+        return [self insert:object];
+    }
+}
+
++(BOOL)insertOrUpdate:(id)object ignoredKeys:(NSArray* const)ignoredKeys{
+    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"uniqueKeys") forClass:[object class]];
+    if(uniqueKeys.count) {
+        NSString* uniqueKey = uniqueKeys.firstObject;
+        id value = [object valueForKey:uniqueKey];
+        NSString* where;
+        if([value isKindOfClass:[NSString class]]){
+            where = [NSString stringWithFormat:@"where %@='%@'",uniqueKey,value];
+        }else{
+            where = [NSString stringWithFormat:@"where %@=%@",uniqueKey,value];
+        }
+        NSArray* querys = [self queryWithClass:[object class] where:where];
+        if(querys.count){
+            return [self updateObj:object ignoredKeys:ignoredKeys where:where];
+        }else{
+            return [self insert:object ignoredKeys:ignoredKeys];
+        }
+    }else{
+        return [self insert:object ignoredKeys:ignoredKeys];
+    }
+}
+
 +(BOOL)inserts:(NSArray* const)array{
     NSAssert(array||array.count,@"数据不能为空!");
     dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
@@ -799,14 +843,14 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
         }];
         
         NSString* tableName = NSStringFromClass(cla);
-        if((sqlKeys.count==0) && (newKeys.count>0)){//NSLog(@"添加新字段...");
+        if((sqlKeys.count==0) && (newKeys.count>0)){NSLog(@"添加新字段...");
             //此处只是增加了新的列.
             for(NSString* key in newKeys){
                 //添加新字段
                 NSString* SQL = [NSString stringWithFormat:@"alter table %@ add %@;",tableName,key];
                 [self execSql:SQL];
             }
-        }else if (sqlKeys.count>0){//NSLog(@"数据库刷新....");
+        }else if (sqlKeys.count>0){NSLog(@"数据库刷新....");
             //字段发生改变,减少或名称变化,实行刷新数据库.
             [self refresh:cla ignoredKeys:ignoredKeys];//进行刷新处理.
         }else;
