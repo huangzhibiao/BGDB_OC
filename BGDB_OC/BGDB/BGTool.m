@@ -189,7 +189,7 @@ static NSSet *foundationClasses_;
     }
     if(!className){
         //判断是否实现了"唯一约束"函数
-        NSArray * uniqueKeys = [self exceSelector:NSSelectorFromString(@"uniqueKeys") modelClass:cla];
+        NSArray * uniqueKeys = [self exceSelector:NSSelectorFromString(@"bg_uniqueKeys") modelClass:cla];
         if (uniqueKeys) {
             for(NSString* uniqueKey in uniqueKeys){
                 NSString* key = name;
@@ -643,30 +643,43 @@ static NSSet *foundationClasses_;
 /**
  字典或json格式字符转模型用的处理函数.
  */
-+(id)objectWithClass:(__unsafe_unretained _Nonnull Class)cla value:(id)value{
++(id)bg_objectWithClass:(__unsafe_unretained _Nonnull Class)cla value:(id)value{
     if(value == nil)return nil;
     
-    NSDictionary* dataDict;
+    NSMutableDictionary* dataDict;
     id object = [cla new];
     if ([value isKindOfClass:[NSString class]]){
         NSAssert([NSJSONSerialization isValidJSONObject:value],@"json数据格式错误!");
-        dataDict = [self jsonWithString:value];
+        dataDict = [[NSMutableDictionary alloc] initWithDictionary:[self jsonWithString:value] copyItems:YES];
     }else if ([value isKindOfClass:[NSDictionary class]]){
-        dataDict = value;
+        dataDict = [[NSMutableDictionary alloc] initWithDictionary:value copyItems:YES];
     }else{
         NSAssert(NO,@"数据格式错误!, 只能转换字典或json格式数据.");
     }
-    NSDictionary* const objectClaInArr = [self getClassInArrayType:object];
+    NSDictionary* const objectClaInArr = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassInArray") forClass:[object class]];//[self getClassInArrayType:object];
+    NSDictionary* const objectClaForCustom = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassForCustom") forClass:[object class]];
     NSArray* const claKeys = [self getClassIvarList:cla];
-    [dataDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        for(BGPropertyInfo* properInfo in claKeys){
-            if ([key isEqualToString:properInfo.name]){
-                __block id ArrObject = dataDict[key];
+    //遍历自定义变量集合信息.
+    !objectClaForCustom?:[objectClaForCustom enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull customKey, id  _Nonnull customObj, BOOL * _Nonnull stop) {
+        if ([customKey containsString:@"."]){
+            NSArray* keyPaths = [customKey componentsSeparatedByString:@"."];
+            id value = [dataDict valueForKeyPath:customKey];
+            dataDict[keyPaths.lastObject] = value;
+            if(![objectClaForCustom.allKeys containsObject:keyPaths.firstObject]){
+                [dataDict removeObjectForKey:keyPaths.firstObject];
+            }
+        }
+    }];
+    [dataDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull dataDictObj, BOOL * _Nonnull stop) {
+        for(NSString* claKey in claKeys){
+            if ([key isEqualToString:claKey]){
+                __block id ArrObject = dataDictObj;
+                //遍历自定义变量数组集合信息.
                 !objectClaInArr?:[objectClaInArr enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull Arrkey, id  _Nonnull ArrObjCla, BOOL * _Nonnull stop){
                     if([key isEqualToString:Arrkey]){
                         NSMutableArray* ArrObjects = [NSMutableArray array];
-                        for(NSDictionary* ArrObject in dataDict[key]){
-                            id obj = [self objectWithClass:ArrObjCla value:ArrObject];
+                        for(NSDictionary* ArrObj in dataDictObj){
+                            id obj = [self bg_objectWithClass:ArrObjCla value:ArrObj];
                             [ArrObjects addObject:obj];
                         }
                         ArrObject = ArrObjects;
@@ -674,6 +687,18 @@ static NSSet *foundationClasses_;
                     }
                 }];
                 
+                //遍历自定义变量集合信息.
+                !objectClaForCustom?:[objectClaForCustom enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull customKey, id  _Nonnull customObj, BOOL * _Nonnull stop) {
+                    NSString* tempKey = customKey;
+                    if ([customKey containsString:@"."]){
+                        tempKey = [customKey componentsSeparatedByString:@"."].lastObject;
+                    }
+                    
+                    if([key isEqualToString:tempKey]){
+                        ArrObject = [self bg_objectWithClass:customObj value:[dataDict valueForKey:tempKey]];
+                        *stop = YES;
+                    }
+                }];
                 
                 [object setValue:ArrObject forKey:key];
                 break;//匹配到了就跳出循环.
@@ -683,6 +708,51 @@ static NSSet *foundationClasses_;
     
     return object;
 }
+
+/**
+ 模型转字典.
+ */
++(NSMutableDictionary*)bg_keyValuesWithObject:(id)object ignoredKeys:(NSArray*)ignoredKeys{
+    NSMutableArray<NSString*>* keys = [[NSMutableArray alloc] initWithArray:[self getClassIvarList:[object class]]];
+    if (ignoredKeys) {
+        [keys removeObjectsInArray:ignoredKeys];
+    }
+    NSDictionary* const objectClaInArr = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassInArray") forClass:[object class]];
+    NSDictionary* const objectClaForCustom = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_dictForCustomClass") forClass:[object class]];
+    NSMutableDictionary* dictM = [NSMutableDictionary dictionary];
+    
+    [keys enumerateObjectsUsingBlock:^(NSString * _Nonnull key, NSUInteger idx, BOOL * _Nonnull stop) {
+        __block id value = [object valueForKey:key];
+        //遍历自定义变量数组集合信息.
+        !objectClaInArr?:[objectClaInArr enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull Arrkey, id  _Nonnull ArrObjCla, BOOL * _Nonnull stop){
+            if([key isEqualToString:Arrkey]){
+                NSMutableArray* ArrObjects = [NSMutableArray array];
+                for(id arrObj in value){
+                    id dictObj = [self bg_keyValuesWithObject:arrObj ignoredKeys:nil];
+                    [ArrObjects addObject:dictObj];
+                }
+                value = ArrObjects;
+                *stop = YES;
+            }
+        }];
+        
+        //遍历自定义变量集合信息.
+        !objectClaForCustom?:[objectClaForCustom enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull customKey, id  _Nonnull customObj, BOOL * _Nonnull stop) {
+            if([key isEqualToString:customKey]){
+                value = [self bg_keyValuesWithObject:[object valueForKey:customKey] ignoredKeys:nil];
+                *stop = YES;
+            }
+        }];
+        
+        //存到集合里.
+        !value?:[dictM setValue:value forKey:key];
+    }];
+    
+    
+    return dictM;
+}
+
+
 //根据NSDictionary转换从数据库读取回来的数组数据
 +(id)valueForArrayRead:(NSDictionary*)dictionary{
     

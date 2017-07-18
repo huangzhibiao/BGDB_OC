@@ -91,7 +91,11 @@ typedef void (^BGClassesEnumeration)(Class c, BOOL *stop);
 /**
  字典或json格式字符转模型用的处理函数.
  */
-+(id)objectWithClass:(__unsafe_unretained Class)cla value:(id)value;
++(id)bg_objectWithClass:(__unsafe_unretained Class)cla value:(id)value;
+/**
+ 模型转字典.
+ */
++(NSMutableDictionary*)bg_keyValuesWithObject:(id)object ignoredKeys:(NSArray*)ignoredKeys;
 +(void)bg_enumerateClasses:(__unsafe_unretained Class)srcCla complete:(BGClassesEnumeration)enumeration
                    finally:(void(^)())block;
 +(BGPropertyInfo*)getProperInfoForCla:(__unsafe_unretained Class)cla Name:(NSString*)name type:(NSString*)type;

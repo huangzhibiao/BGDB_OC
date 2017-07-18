@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "BGTool.h"
+#import "BGSqliteConfig.h"
 
 @interface BGSqlite : NSObject
 @property(nonatomic,assign)BOOL debug;
@@ -16,6 +17,10 @@
  获取某个类的数据条数.
  */
 +(NSInteger)count:(Class)model_class where:(NSString*)where;
+/**
+ 直接调用sqliteb的原生函数计算sun,min,max,avg等.
+ */
++(NSInteger)sqliteMethodWithClass:(Class)model_class type:(bg_sqliteMethodType)methodType key:(NSString*)key where:(NSString*)where;
 /**
  插入对象.
  @object 对象

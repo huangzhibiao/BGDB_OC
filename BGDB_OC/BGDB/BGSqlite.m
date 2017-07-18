@@ -232,7 +232,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
     BGDebug(SQL)
     sqlite3_exec(BG_Database, [SQL UTF8String], block ? BGDBExecuteBulkSQLCallback : nil, (__bridge void *)(block), &errmsg);
     if (errmsg) {
-        NSString* sqlError = [NSString stringWithFormat:@"Error inserting batch: %s", errmsg];
+        NSString* sqlError = [NSString stringWithFormat:@"执行SQL语句错误: %s", errmsg];
         BGDebug(sqlError)
         sqlite3_free(errmsg);
     }
@@ -240,6 +240,68 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
     }
     dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
     return count;
+}
+
++(NSInteger)sqliteMethodWithClass:(Class)model_class type:(bg_sqliteMethodType)methodType key:(NSString*)key where:(NSString*)where{
+    dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
+    __block NSInteger num = -1;
+    @autoreleasepool {
+        if (![self isExistSqliteWithClass:model_class])return num;
+        
+        NSString* database_cache_path = [self getSqlitePathWithClass:model_class];
+        if (sqlite3_open([database_cache_path UTF8String], &BG_Database) != SQLITE_OK)return num;
+        BGDBExecuteStatementsCallbackBlock block = ^(NSDictionary* info){
+            id dbResult = [info.allValues lastObject];
+            if(dbResult && ![dbResult isKindOfClass:[NSNull class]]) {
+                num = [dbResult integerValue];
+            }else{
+                num = 0;
+            }
+            return 0;
+        };
+        if([key containsString:@"."]) {
+            key = [key stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
+        }
+        NSString* method;
+        switch (methodType) {
+            case bg_min:
+                method = [NSString stringWithFormat:@"min(%@%@)",BG,key];
+                break;
+            case bg_max:
+                method = [NSString stringWithFormat:@"max(%@%@)",BG,key];
+                break;
+            case bg_sum:
+                method = [NSString stringWithFormat:@"sum(%@%@)",BG,key];
+                break;
+            case bg_avg:
+                method = [NSString stringWithFormat:@"avg(%@%@)",BG,key];
+                break;
+            default:
+                NSAssert(NO,@"请传入方法类型!");
+                break;
+        }
+        if ([where containsString:@"."]) {
+            where = [where stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
+        }
+        NSString* SQL;
+        if(where){
+            SQL = [NSString stringWithFormat:@"select %@ from %@ %@",method,NSStringFromClass(model_class),where];
+        }else{
+            SQL = [NSString stringWithFormat:@"select %@ from %@",method,NSStringFromClass(model_class)];
+        }
+        char *errmsg = nil;
+        BGDebug(SQL)
+        sqlite3_exec(BG_Database, [SQL UTF8String], block ? BGDBExecuteBulkSQLCallback : nil, (__bridge void *)(block), &errmsg);
+        if (errmsg) {
+            NSString* sqlError = [NSString stringWithFormat:@"执行SQL语句错误: %s", errmsg];
+            BGDebug(sqlError)
+            sqlite3_free(errmsg);
+        }
+        [self close];
+    }
+    dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
+    return num;
+
 }
 
 +(BOOL)openTable:(Class)model_class{
@@ -399,7 +461,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)insertOrUpdate:(id)object{
-    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"uniqueKeys") forClass:[object class]];
+    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_uniqueKeys") forClass:[object class]];
     if(uniqueKeys.count) {
         NSString* uniqueKey = uniqueKeys.firstObject;
         id value = [object valueForKey:uniqueKey];
@@ -421,7 +483,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)insertOrUpdate:(id)object ignoredKeys:(NSArray* const)ignoredKeys{
-    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"uniqueKeys") forClass:[object class]];
+    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_uniqueKeys") forClass:[object class]];
     if(uniqueKeys.count) {
         NSString* uniqueKey = uniqueKeys.firstObject;
         id value = [object valueForKey:uniqueKey];
@@ -551,7 +613,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
             NSMutableString* SQL = [NSMutableString stringWithFormat:@"select * from %@",tableName];
             if (where) {
                 if ([where containsString:@"."]) {
-                   where = [where stringByReplacingOccurrencesOfString:@"." withString:@"$"];
+                   where = [where stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
                 }
                 [SQL appendFormat:@" %@",where];
             }
@@ -607,7 +669,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
             if([self openTable:[object class]]){
                 [self ifIvarChangeForClass:[object class] ignoredKeys:nil];//自动判断更新数据库.
                 if (where && [where containsString:@"."]) {
-                    where = [where stringByReplacingOccurrencesOfString:@"." withString:@"$"];
+                    where = [where stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
                 }
                 Begin_Transcation
                 result = [self updateToDB:object where:where];
@@ -680,7 +742,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
             if([self openTable:[object class]]){
                 //[self ifIvarChangeForClass:[object class] ignoredKeys:ignoredKeys];//自动判断更新数据库.
                 if (where && [where containsString:@"."]) {
-                    where = [where stringByReplacingOccurrencesOfString:@"." withString:@"$"];
+                    where = [where stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
                 }
                 Begin_Transcation
                 result = [self updateToDB:object ignoredKeys:ignoredKeys where:where];
@@ -706,7 +768,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
                 //静态的更新不需要更新数据库检查.
                 NSMutableString* SQL = [NSMutableString stringWithFormat:@"update %@ ",[BGTool getTableNameWithCalss:model_class]];
                     if ([sql containsString:@"."]) {
-                        sql = [sql stringByReplacingOccurrencesOfString:@"." withString:@"$"];
+                        sql = [sql stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
                     }
                 [SQL appendString:sql];
                 Begin_Transcation
@@ -732,7 +794,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
                 NSMutableString* SQL = [NSMutableString stringWithFormat:@"delete from %@",[BGTool getTableNameWithCalss:model_class]];
                 if (where) {
                     if ([where containsString:@"."]) {
-                        where = [where stringByReplacingOccurrencesOfString:@"." withString:@"$"];
+                        where = [where stringByReplacingOccurrencesOfString:@"." withString:BG_PropertySeparator];
                     }
                     [SQL appendFormat:@" %@",where];
                 }

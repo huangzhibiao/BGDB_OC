@@ -10,7 +10,7 @@
 
 @implementation father
 
-//+(NSArray *)uniqueKeys{
+//+(NSArray *)bg_uniqueKeys{
 //    return @[@"fa"];
 //}
 
@@ -25,7 +25,7 @@
 /**
  想要定义'唯一约束',实现该函数返回相应的key即可.
  */
-//+(NSArray *)uniqueKeys{
+//+(NSArray *)bg_uniqueKeys{
 //    return @[@"name",@"sex"];
 //}
 
@@ -35,8 +35,8 @@
 /**
  想要定义'唯一约束',实现该函数返回相应的key即可.
  */
-+(NSArray *)uniqueKeys{
-    return @[@"name"];
-}
+//+(NSArray *)bg_uniqueKeys{
+//    return @[@"name"];
+//}
 
 @end

@@ -26,7 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [People setDebug:YES];
+    bg_setDebug(YES);
     People* p = [People new];
     p.fa = YES;
     p.aId = @"100";
@@ -54,48 +54,53 @@
     /**
      存储.
      */
-    [p saveOrUpdate];
+    [p bg_saveOrUpdate];
     
     /**
      忽略某些属性存储.
      */
-    //[p saveIgnoredkeys:@[@"name",@"age",@"dog.name",@"dog.age"]];
+    //[p bg_saveIgnoredkeys:@[@"name",@"age",@"dog.name",@"dog.age"]];
     
     /**
      更新(条件语句跟sqlite原生的一样).
      */
-    //[p updateWhere:@"where name='大哥哥' and dog.name='二哈'"];
+    //[p bg_updateWhere:@"where name='大哥哥' and dog.name='二哈'"];
     
     /**
      忽略某些属性不要更新(条件语句跟sqlite原生的一样).
      */
-    //[p updateWhere:@"where age=26 and dog.name='二哈111'" ignoredkeys:@[@"name",@"dog.name",@"dog.age"]];
+    //[p bg_updateWhere:@"where age=26 and dog.name='二哈111'" ignoredkeys:@[@"name",@"dog.name",@"dog.age"]];
     
     /**
      sql语句批量更新设置.
      */
-    //[People updateSet:@"set name='黄芝标' where age=26"];
+    //[People bg_updateSet:@"set name='黄芝标' where age=26"];
     
     /**
      条件查询(条件语句跟sqlite原生的一样).
      */
-    //NSArray* pSome = [People findWhere:@"where age=26 or dog.name='二哈-------'"];
+    //NSArray* pSome = [People bg_findWhere:@"where age=26 or dog.name='二哈-------'"];
     
     /**
      条件删除(条件语句跟sqlite原生的一样).
      */
-    //[People deleteWhere:@"where name='黄芝标'"];
+    //[People bg_deleteWhere:@"where name='黄芝标'"];
+    
+    /**
+     直接调用sqliteb的原生函数计算sun,min,max,avg等.
+     */
+//    NSInteger sum = [People bg_sqliteMethodWithType:bg_avg key:@"dog.age" where:@"where dog.age>15"];
+//    NSLog(@"----sum = %ld",sum);
     
     /**
      查询全部.
      */
-    NSArray* pAll = [People findAll];
+    NSArray* pAll = [People bg_findAll];
     for(People* p in pAll){
         NSLog(@"主键ID = %@",p.ID);
     }
     People* lastOne = pAll.lastObject;
     _imageView.image = p.array.lastObject;
-    NSLog(@"----");
 }
 
 

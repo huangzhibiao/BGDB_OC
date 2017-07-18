@@ -38,8 +38,9 @@
 
 /**
  设置调试模式
+ @debug YES:打印调试信息, NO:不打印调试信息.
  */
-+(void)setDebug:(BOOL)debug{
+void bg_setDebug(BOOL debug){
     if ([BGSqlite shareInstance].debug != debug){//防止重复设置.
         [BGSqlite shareInstance].debug = debug;
     }
@@ -49,21 +50,21 @@
 /**
  存储.
  */
--(BOOL)save{
+-(BOOL)bg_save{
     return [BGSqlite insert:self];
 }
 /**
  存储.
  @ignoredkeys 忽略某些属性不要存.
  */
--(BOOL)saveIgnoredkeys:(NSArray* const)ignorekeys{
+-(BOOL)bg_saveIgnoredkeys:(NSArray* const)ignorekeys{
     return [BGSqlite insert:self ignoredKeys:ignorekeys];
 }
 /**
  存储.
  当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
  */
--(BOOL)saveOrUpdate{
+-(BOOL)bg_saveOrUpdate{
     return [BGSqlite insertOrUpdate:self];
 }
 /**
@@ -71,65 +72,77 @@
  当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果数据存在则更新,没有则存储.
  @ignoredkeys 忽略某些属性不要存.
  */
--(BOOL)saveOrUpdate:(NSArray* const)ignorekeys{
+-(BOOL)bg_saveOrUpdate:(NSArray* const)ignorekeys{
     return [BGSqlite insertOrUpdate:self ignoredKeys:ignorekeys];
 }
 /**
  批量存储.
  */
-+(BOOL)saveArray:(NSArray* const)array{
++(BOOL)bg_saveArray:(NSArray* const)array{
     return [BGSqlite inserts:array];
 }
 /**
  批量存储.
  @ignoredkeys 忽略某些属性不要存.
  */
-+(BOOL)saveArray:(NSArray* const)array ignoredkeys:(NSArray* const)ignorekeys{
++(BOOL)bg_saveArray:(NSArray* const)array ignoredkeys:(NSArray* const)ignorekeys{
     return [BGSqlite inserts:array ignoredKeys:ignorekeys];
 }
 /**
  查询全部.
  */
-+(NSArray*)findAll{
++(NSArray*)bg_findAll{
     return [BGSqlite queryWithClass:[self class] where:nil];
 }
 /**
  条件查询.
  */
-+(NSArray*)findWhere:(NSString*)where{
++(NSArray*)bg_findWhere:(NSString*)where{
     return [BGSqlite queryWithClass:[self class] where:where];
 }
 /**
  更新.
  */
--(BOOL)updateWhere:(NSString*)where{
+-(BOOL)bg_updateWhere:(NSString*)where{
     return [BGSqlite updateObj:self where:where];
 }
 /**
  忽略某些属性不要更新.
  @ignoredkeys 忽略某些属性不要更新.
  */
--(BOOL)updateWhere:(NSString*)where ignoredkeys:(NSArray* const)ignoredkeys{
+-(BOOL)bg_updateWhere:(NSString*)where ignoredkeys:(NSArray* const)ignoredkeys{
     return [BGSqlite updateObj:self ignoredKeys:ignoredkeys where:where];
 }
 /**
  更新.
  */
-+(BOOL)updateSet:(NSString*)setSql{
++(BOOL)bg_updateSet:(NSString*)setSql{
     return [BGSqlite updateSet:[self class] sql:setSql];
 }
 /**
  根据条件删除数据.
  @where 删除条件语句,nil时删除全部.
  */
-+(BOOL)deleteWhere:(NSString*)where{
++(BOOL)bg_deleteWhere:(NSString*)where{
     return [BGSqlite deleteWithClass:[self class] where:where];
 }
 /**
  删除数据库.
  */
-+(BOOL)drop{
++(BOOL)bg_drop{
     return [BGSqlite dropWithClass:[self class]];
+}
+/**
+ 查询该类中有多少条数据
+ */
++(NSInteger)bg_countWhere:(NSString*)where{
+    return [BGSqlite count:[self class] where:where];
+}
+/**
+ 直接调用sqliteb的原生函数计算sun,min,max,avg等.
+ */
++(NSInteger)bg_sqliteMethodWithType:(bg_sqliteMethodType)methodType key:(NSString*)key where:(NSString*)where{
+    return [BGSqlite sqliteMethodWithClass:[self class] type:methodType key:key where:where];
 }
 /**
  获取数据库版本号.
@@ -139,12 +152,13 @@
     NSString* tableName = [BGTool getTableNameWithCalss:[self class]];
     return [BGTool getIntegerWithKey:tableName];
 }
+
 /**
  更新数据库.
  当'唯一约束'发生改变时,调用此API进行数据库更新升级.
  注：本次更新的版本号要大于现有的版本号,否则不做升级.
  */
-+(void)updateVersion:(NSInteger)version{
++(void)bg_updateVersion:(NSInteger)version{
     if (version > [self bg_version]) {
         NSString* tableName = [BGTool getTableNameWithCalss:[self class]];
         [BGTool setIntegerWithKey:tableName value:version];
@@ -159,10 +173,16 @@
  说明:如果模型中有数组且存放的是自定义的类(NSString等系统自带的类型就不必要了),那就实现objectClassInArray这个函数返回一个字典,key是数组名称,value是自定的类Class,用法跟MJExtension一样.
  */
 +(id)bg_objectWithKeyValues:(id)keyValues{
-    return [BGTool objectWithClass:[self class] value:keyValues];
+    return [BGTool bg_objectWithClass:[self class] value:keyValues];
 }
 +(id)bg_objectWithDictionary:(NSDictionary *)dictionary{
-    return [BGTool objectWithClass:[self class] value:dictionary];
+    return [BGTool bg_objectWithClass:[self class] value:dictionary];
 }
-
+/**
+ 模型转字典.
+ @ignoredKeys 忽略掉模型中的哪些key(即模型变量)不要转,nil时全部转成字典.
+ */
+-(NSMutableDictionary*)bg_keyValuesIgnoredKeys:(NSArray*)ignoredKeys{
+    return [BGTool bg_keyValuesWithObject:self ignoredKeys:ignoredKeys];
+}
 @end
