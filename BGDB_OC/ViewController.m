@@ -26,7 +26,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    /**
+     设置调试模式
+     */
     bg_setDebug(YES);
+    /**
+     自定义目录名称(默认BGSqlite)
+     */
+    //bg_setSqliteDirectory(@"QY");
+    
     People* p = [People new];
     p.fa = YES;
     p.aId = @"100";
@@ -50,6 +58,7 @@
     p.dog = dog;
     
     p.array = @[dog,cat,[UIImage imageNamed:@"ima2"]];
+    
     
     /**
      存储.

@@ -41,11 +41,20 @@
  @debug YES:打印调试信息, NO:不打印调试信息.
  */
 void bg_setDebug(BOOL debug){
-    if ([BGSqlite shareInstance].debug != debug){//防止重复设置.
+    if([BGSqlite shareInstance].debug != debug){//防止重复设置.
         [BGSqlite shareInstance].debug = debug;
     }
 }
 
+/**
+ 设置数据库目录
+ @directory 目录名称(默认BGSqlite).
+ */
+extern void bg_setSqliteDirectory(NSString* directory){
+    if(![directory isEqualToString:[BGSqlite shareInstance].sqliteDirectoryName]) {
+        [BGSqlite shareInstance].sqliteDirectoryName = directory;
+    }
+}
 
 /**
  存储.

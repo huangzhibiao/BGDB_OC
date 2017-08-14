@@ -11,7 +11,11 @@
 #import "BGSqliteConfig.h"
 
 @interface BGSqlite : NSObject
+
 @property(nonatomic,assign)BOOL debug;
+
+@property(nonatomic,copy)NSString* sqliteDirectoryName;
+
 +(instancetype)shareInstance;
 /**
  获取某个类的数据条数.

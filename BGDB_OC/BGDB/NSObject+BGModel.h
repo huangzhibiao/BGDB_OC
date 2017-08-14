@@ -50,6 +50,11 @@
  */
 extern void bg_setDebug(BOOL debug);
 /**
+ 设置数据库目录
+ @directory 目录名称(默认BGSqlite).
+ */
+extern void bg_setSqliteDirectory(NSString* directory);
+/**
  存储.
  */
 -(BOOL)bg_save;

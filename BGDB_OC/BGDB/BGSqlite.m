@@ -91,8 +91,9 @@ static sqlite3* BG_Database;
 /**
  获取数据库的存放目录.
  */
-+ (NSString *)BGSqliteCacheDirectory {
-    return [NSString stringWithFormat:@"%@/Library/Caches/BGSqlite/",NSHomeDirectory()];
++ (NSString *)BGSqliteCacheDirectory{
+    NSString* cachePath = [NSString stringWithFormat:@"%@/%@/",[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject],[BGSqlite shareInstance].sqliteDirectoryName?[BGSqlite shareInstance].sqliteDirectoryName:@"BGSqlite"];
+    return cachePath;
 }
 
 /**
