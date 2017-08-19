@@ -395,8 +395,8 @@ static NSSet *foundationClasses_;
 //NSMapTable转json字符串.
 +(NSString*)jsonStringWithMapTable:(NSMapTable*)mapTable{
     NSMutableDictionary* dictM = [NSMutableDictionary dictionary];
-    NSArray* objects = mapTable.keyEnumerator.allObjects;
-    NSArray* keys = mapTable.objectEnumerator.allObjects;
+    NSArray* objects = mapTable.objectEnumerator.allObjects;
+    NSArray* keys = mapTable.keyEnumerator.allObjects;
     for(int i=0;i<objects.count;i++){
         dictM[keys[i]] = [self dictionaryForDictionaryInsert:objects[i]];
     }
