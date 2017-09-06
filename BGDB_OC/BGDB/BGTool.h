@@ -36,6 +36,8 @@
 
 //存入数据库的字段,自定义类变量分隔符
 #define BG_PropertySeparator @"$"
+//自定义变量属性嵌套分隔符.
+#define BG_CustomPropertySeparator @"->"
 
 /**
  *  遍历所有类的block（父类）
