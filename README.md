@@ -7,7 +7,7 @@ BGFMDB是在FMDB的基础上进行封装,由于多了中间一层的转化,所�
 ### Podfile
 platform :ios, '8.0'   
 target '工程名称' do   
-pod ‘BGDB_OC’, '~> 1.3’   
+pod ‘BGDB_OC’, '~> 1.6’   
 end
 ## 手动导入
 1.直接下载库源码   
@@ -44,21 +44,27 @@ end
 [p bg_save];
 
 /**
+ 存储.
+ 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+ */
+[p bg_saveOrUpdate];
+
+/**
 忽略某些属性存储.
 */
-[p bg_saveIgnoredkeys:@[@"name",@"age",@"dog.name",@"dog.age"]];
+[p bg_saveIgnoredkeys:@[@"name",@"age",@"dog->name",@"dog->age"]];
 ```
 ## 更新
 ```Objective-C
 /**
 更新(条件语句跟sqlite原生的一样).
  */
-[p bg_updateWhere:@"where name='大哥哥' and dog.name='二哈'"];
+[p bg_updateWhere:@"where name='大哥哥' and dog->name='二哈'"];
 
 /**
 忽略某些属性不要更新(条件语句跟sqlite原生的一样).
 */
-[p bg_updateWhere:@"where age=26 and dog.name='二哈111'" ignoredkeys:@[@"name",@"dog.name",@"dog.age"]];
+[p bg_updateWhere:@"where age=26 and dog->name='二哈111'" ignoredkeys:@[@"name",@"dog->name",@"dog->age"]];
 
 /**
 sql语句批量更新设置.
@@ -75,7 +81,7 @@ NSArray* All = [People bg_findAll];
 /**
 条件查询(条件语句跟sqlite原生的一样).
 */
-NSArray* pSome = [People bg_findWhere:@"where age=26 or dog.name='二哈-------'"];
+NSArray* pSome = [People bg_findWhere:@"where age=26 or dog->name='二哈'"];
 ```
 ## 删除.
 ```Objective-C
