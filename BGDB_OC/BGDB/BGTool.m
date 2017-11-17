@@ -294,7 +294,13 @@ static NSSet *foundationClasses_;
     for(BGPropertyInfo* properInfo in keyAndTypes){
         NSString* propertyName = properInfo.name;
         if(![propertyName isEqualToString:BGPrimaryKey]){
-            id propertyValue = [object valueForKey:propertyName];
+            id propertyValue = nil;
+            if([propertyName containsString:BG_PropertySeparator]){
+                NSString* propertyNameForKeyPath = [propertyName stringByReplacingOccurrencesOfString:BG_PropertySeparator withString:@"."];
+                propertyValue = [object valueForKeyPath:propertyNameForKeyPath];
+            }else{
+                propertyValue = [object valueForKey:propertyName];
+            }
             if (propertyValue){
                 id Value = [self getSqlValue:propertyValue properInfo:properInfo encode:YES];
                 //特殊处理数组自定义类中的二进制数据类型.

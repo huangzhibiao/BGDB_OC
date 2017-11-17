@@ -54,6 +54,7 @@
     
     Cat* cat = [Cat new];
     cat.name = @"蓝猫1";
+    dog.cat = cat;
     
     p.dog = dog;
     
@@ -64,6 +65,12 @@
      存储.
      */
     [p bg_save];
+    
+    /**
+     存储.
+     当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+     */
+    //[p bg_saveOrUpdate];
     
     /**
      忽略某些属性存储.

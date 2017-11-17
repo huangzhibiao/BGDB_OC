@@ -28,7 +28,7 @@
 @property (nonatomic, copy) NSString * BGCreateTime;
 @property (nonatomic, copy) NSString * BGUpdateTime;
 //@property(nonatomic,strong)UIImage* image;
-//@property(nonatomic,strong)Cat* cat;
+@property(nonatomic,strong)Cat* cat;
 @end
 
 @interface People : father
