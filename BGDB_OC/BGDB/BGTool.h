@@ -11,8 +11,9 @@
 #import "BGModelInfo.h"
 #import "BGPropertyInfo.h"
 
-// 过期
-#define BGFMDBDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
+
+#define bg_uniqueKeysSelector NSSelectorFromString(@"bg_uniqueKeys")
+#define bg_ignoreKeysSelector NSSelectorFromString(@"bg_ignoreKeys")
 
 #define SqlText @"text" //数据库的字符类型
 #define SqlReal @"real" //数据库的浮点类型
@@ -102,9 +103,9 @@ typedef void (^BGClassesEnumeration)(Class c, BOOL *stop);
                    finally:(void(^)())block;
 +(BGPropertyInfo*)getProperInfoForCla:(__unsafe_unretained Class)cla Name:(NSString*)name type:(NSString*)type;
 /**
- 判断类是否实现了某个类方法.
+ 判断并执行类方法.
  */
-+(id)isRespondsToSelector:(SEL)selector forClass:(Class)cla;
++(id)executeSelector:(SEL)selector modelClass:(Class)model_class;
 /**
  NSUserDefaults封装使用函数.
  */

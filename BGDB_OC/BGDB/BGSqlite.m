@@ -217,10 +217,16 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
     dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
     __block NSInteger count = -1;
     @autoreleasepool {
-    if (![self isExistSqliteWithClass:model_class])return count;
+    if(![self isExistSqliteWithClass:model_class]){
+        dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
+        return count;
+    }
     
     NSString* database_cache_path = [self getSqlitePathWithClass:model_class];
-    if (sqlite3_open([database_cache_path UTF8String], &BG_Database) != SQLITE_OK)return count;
+    if (sqlite3_open([database_cache_path UTF8String], &BG_Database) != SQLITE_OK){
+        dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
+        return count;
+    }
     BGDBExecuteStatementsCallbackBlock block = ^(NSDictionary* info){
         count = [[info.allValues lastObject] integerValue];
         return 0;
@@ -250,10 +256,16 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
     dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
     __block NSInteger num = -1;
     @autoreleasepool {
-        if (![self isExistSqliteWithClass:model_class])return num;
+        if (![self isExistSqliteWithClass:model_class]){
+            dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
+            return num;
+        }
         
         NSString* database_cache_path = [self getSqlitePathWithClass:model_class];
-        if (sqlite3_open([database_cache_path UTF8String], &BG_Database) != SQLITE_OK)return num;
+        if (sqlite3_open([database_cache_path UTF8String], &BG_Database) != SQLITE_OK){
+            dispatch_semaphore_signal([BGSqlite shareInstance].BG_Semaphore);
+            return num;
+        }
         BGDBExecuteStatementsCallbackBlock block = ^(NSDictionary* info){
             id dbResult = [info.allValues lastObject];
             if(dbResult && ![dbResult isKindOfClass:[NSNull class]]) {
@@ -465,7 +477,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)insertOrUpdate:(id)object{
-    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_uniqueKeys") forClass:[object class]];
+    NSArray* uniqueKeys = [BGTool executeSelector:bg_uniqueKeysSelector modelClass:[object class]];
     if(uniqueKeys.count) {
         NSString* uniqueKey = uniqueKeys.firstObject;
         id value = [object valueForKey:uniqueKey];
@@ -487,7 +499,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)insertOrUpdate:(id)object ignoredKeys:(NSArray* const)ignoredKeys{
-    NSArray* uniqueKeys = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_uniqueKeys") forClass:[object class]];
+    NSArray* uniqueKeys = [BGTool executeSelector:bg_uniqueKeysSelector modelClass:[object class]];
     if(uniqueKeys.count) {
         NSString* uniqueKey = uniqueKeys.firstObject;
         id value = [object valueForKey:uniqueKey];
@@ -909,14 +921,14 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
         }];
         
         NSString* tableName = NSStringFromClass(cla);
-        if((sqlKeys.count==0) && (newKeys.count>0)){NSLog(@"添加新字段...");
+        if((sqlKeys.count==0) && (newKeys.count>0)){
             //此处只是增加了新的列.
             for(NSString* key in newKeys){
                 //添加新字段
                 NSString* SQL = [NSString stringWithFormat:@"alter table %@ add %@;",tableName,key];
                 [self execSql:SQL];
             }
-        }else if (sqlKeys.count>0){NSLog(@"数据库刷新....");
+        }else if (sqlKeys.count>0){
             //字段发生改变,减少或名称变化,实行刷新数据库.
             [self refresh:cla ignoredKeys:ignoredKeys];//进行刷新处理.
         }else;

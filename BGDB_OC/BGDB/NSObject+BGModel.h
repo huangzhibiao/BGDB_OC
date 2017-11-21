@@ -18,6 +18,10 @@
  */
 +(NSArray*)bg_uniqueKeys;
 /**
+ @return 返回不需要存储的属性.
+ */
++(NSArray*)bg_ignoreKeys;
+/**
  数组中需要转换的模型类
  @return 字典中的key是数组属性名，value是数组中存放模型的Class
  */
@@ -32,6 +36,10 @@
  模型转字典用.
  */
 +(NSDictionary*)bg_dictForCustomClass;
+/**
+ 替换变量的功能(及当字典的key和属性名不一样时，进行映射对应起来)
+ */
++(NSDictionary *)bg_replacedKeyFromPropertyName;
 @end
 
 @interface NSObject (BGModel)<BGProtocol>
@@ -58,31 +66,17 @@ extern void bg_setSqliteDirectory(NSString* directory);
  存储.
  */
 -(BOOL)bg_save;
-/**
- 存储.
- @ignoredkeys 忽略某些属性不要存.
- */
--(BOOL)bg_saveIgnoredkeys:(NSArray* const)ignorekeys;
+
 /**
  存储.
  当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
  */
 -(BOOL)bg_saveOrUpdate;
-/**
- 存储.
- 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
- @ignoredkeys 忽略某些属性不要存.
- */
--(BOOL)bg_saveOrUpdate:(NSArray* const)ignorekeys;
+
 /**
  批量存储.
  */
 +(BOOL)bg_saveArray:(NSArray* const)array;
-/**
- 批量存储.
- @ignoredkeys 忽略某些属性不要存.
- */
-+(BOOL)bg_saveArray:(NSArray* const)array ignoredkeys:(NSArray* const)ignorekeys;
 /**
  查询全部.
  */
@@ -95,11 +89,6 @@ extern void bg_setSqliteDirectory(NSString* directory);
  更新.
  */
 -(BOOL)bg_updateWhere:(NSString*)where;
-/**
- 忽略某些属性不要更新.
- @ignoredkeys 忽略某些属性不要更新.
- */
--(BOOL)bg_updateWhere:(NSString*)where ignoredkeys:(NSArray* const)ignoredkeys;
 /**
  批量更新.
  */
@@ -142,8 +131,38 @@ extern void bg_setSqliteDirectory(NSString* directory);
 +(id)bg_objectWithKeyValues:(id)keyValues;
 +(id)bg_objectWithDictionary:(NSDictionary*)dictionary;
 /**
+ 直接传数组批量处理;
+ 注:array中的元素是字典,否则出错.
+ */
++(NSArray*)bg_objectArrayWithKeyValuesArray:(NSArray* const)array;
+/**
  模型转字典.
  @ignoredKeys 忽略掉模型中的哪些key(即模型变量)不要转,nil时全部转成字典.
  */
 -(NSMutableDictionary*)bg_keyValuesIgnoredKeys:(NSArray*)ignoredKeys;
+
+
+
+#warning mark 过期方法(能正常使用,但不建议使用)
+/**
+ 存储.
+ @ignoredkeys 忽略某些属性不要存.
+ */
+-(BOOL)bg_saveIgnoredkeys:(NSArray* const)ignorekeys BGDBDeprecated("此方法已过期(能正常使用,但不建议使用)，在模型的.m文件中实现bg_ignoreKeys函数即可");
+/**
+ 存储.
+ 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+ @ignoredkeys 忽略某些属性不要存.
+ */
+-(BOOL)bg_saveOrUpdate:(NSArray* const)ignorekeys BGDBDeprecated("此方法已过期(能正常使用,但不建议使用)，在模型的.m文件中实现bg_ignoreKeys函数即可");
+/**
+ 批量存储.
+ @ignoredkeys 忽略某些属性不要存.
+ */
++(BOOL)bg_saveArray:(NSArray* const)array ignoredkeys:(NSArray* const)ignorekeys BGDBDeprecated("此方法已过期(能正常使用,但不建议使用)，在模型的.m文件中实现bg_ignoreKeys函数即可");
+/**
+ 忽略某些属性不要更新.
+ @ignoredkeys 忽略某些属性不要更新.
+ */
+-(BOOL)bg_updateWhere:(NSString*)where ignoredkeys:(NSArray* const)ignoredkeys BGDBDeprecated("此方法已过期(能正常使用,但不建议使用)，在模型的.m文件中实现bg_ignoreKeys函数即可");
 @end

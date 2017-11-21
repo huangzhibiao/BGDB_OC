@@ -9,6 +9,9 @@
 #ifndef BGSqliteConfig_h
 #define BGSqliteConfig_h
 
+// 过期方法注释
+#define BGDBDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
+
 typedef NS_ENUM(NSInteger,bg_sqliteMethodType){//处理状态
     bg_min,//求最小值
     bg_max,//求最大值

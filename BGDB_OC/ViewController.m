@@ -56,6 +56,8 @@
     cat.name = @"蓝猫1";
     dog.cat = cat;
     
+    dog.cats = [NSMutableArray array];
+    [dog.cats addObject:cat];
     p.dog = dog;
     
     p.array = @[dog,cat,[UIImage imageNamed:@"ima2"]];
@@ -119,7 +121,7 @@
         NSLog(@"主键ID = %@",p.ID);
     }
     People* lastOne = pAll.lastObject;
-    _imageView.image = p.array.lastObject;
+    _imageView.image = lastOne.array.lastObject;
 }
 
 

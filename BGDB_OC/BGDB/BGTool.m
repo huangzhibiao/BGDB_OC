@@ -91,7 +91,10 @@ static NSSet *foundationClasses_;
     }];
     return result;
 }
-+ (id)exceSelector:(SEL)selector modelClass:(Class)model_class{
+/**
+ 判断并执行类方法.
+ */
++ (id)executeSelector:(SEL)selector modelClass:(Class)model_class{
     id obj = nil;
     if([model_class respondsToSelector:selector]){
 #pragma clang diagnostic push
@@ -189,7 +192,7 @@ static NSSet *foundationClasses_;
     }
     if(!className){
         //判断是否实现了"唯一约束"函数
-        NSArray * uniqueKeys = [self exceSelector:NSSelectorFromString(@"bg_uniqueKeys") modelClass:cla];
+        NSArray * uniqueKeys = [self executeSelector:bg_uniqueKeysSelector modelClass:cla];
         if (uniqueKeys) {
             for(NSString* uniqueKey in uniqueKeys){
                 NSString* key = name;
@@ -662,8 +665,9 @@ static NSSet *foundationClasses_;
     }else{
         NSAssert(NO,@"数据格式错误!, 只能转换字典或json格式数据.");
     }
-    NSDictionary* const objectClaInArr = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassInArray") forClass:[object class]];//[self getClassInArrayType:object];
-    NSDictionary* const objectClaForCustom = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassForCustom") forClass:[object class]];
+    NSDictionary* const objectClaInArr = [self executeSelector:NSSelectorFromString(@"bg_objectClassInArray") modelClass:[object class]];
+    NSDictionary* const objectClaForCustom = [self executeSelector:NSSelectorFromString(@"bg_objectClassForCustom") modelClass:[object class]];
+    NSDictionary* const bg_replacedKeyFromPropertyNameDict = [self executeSelector:NSSelectorFromString(@"bg_replacedKeyFromPropertyName") modelClass:[object class]];
     NSArray* const claKeys = [self getClassIvarList:cla];
     //遍历自定义变量集合信息.
     !objectClaForCustom?:[objectClaForCustom enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull customKey, id  _Nonnull customObj, BOOL * _Nonnull stop) {
@@ -676,6 +680,17 @@ static NSSet *foundationClasses_;
             }
         }
     }];
+    
+    //处理要替换的key和属性名.
+    if(bg_replacedKeyFromPropertyNameDict && bg_replacedKeyFromPropertyNameDict.count){
+        [bg_replacedKeyFromPropertyNameDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if([dataDict.allKeys containsObject:key]){
+                dataDict[obj] = dataDict[key];
+                [dataDict removeObjectForKey:key];
+            }
+        }];
+    }
+    
     [dataDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull dataDictObj, BOOL * _Nonnull stop) {
         for(NSString* claKey in claKeys){
             if ([key isEqualToString:claKey]){
@@ -723,10 +738,11 @@ static NSSet *foundationClasses_;
     if (ignoredKeys) {
         [keys removeObjectsInArray:ignoredKeys];
     }
-    NSDictionary* const objectClaInArr = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_objectClassInArray") forClass:[object class]];
-    NSDictionary* const objectClaForCustom = [BGTool isRespondsToSelector:NSSelectorFromString(@"bg_dictForCustomClass") forClass:[object class]];
-    NSMutableDictionary* dictM = [NSMutableDictionary dictionary];
     
+    NSDictionary* const objectClaInArr = [self executeSelector:NSSelectorFromString(@"bg_objectClassInArray") modelClass:[object class]];
+    NSDictionary* const objectClaForCustom = [self executeSelector:NSSelectorFromString(@"bg_dictForCustomClass") modelClass:[object class]];
+    
+    NSMutableDictionary* dictM = [NSMutableDictionary dictionary];
     [keys enumerateObjectsUsingBlock:^(NSString * _Nonnull key, NSUInteger idx, BOOL * _Nonnull stop) {
         __block id value = [object valueForKey:key];
         //遍历自定义变量数组集合信息.
@@ -891,33 +907,7 @@ static NSSet *foundationClasses_;
     }
     return arrM;
 }
-/**
- 获取字典转模型部分的数组数据类型
- */
-+(NSDictionary*)getClassInArrayType:(id)object{
-    NSDictionary* dict = nil;
-    SEL objectClassInArraySeltor = NSSelectorFromString(@"objectClassInArray");
-    if([object respondsToSelector:objectClassInArraySeltor]){
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        dict = [object performSelector:objectClassInArraySeltor];
-#pragma clang diagnostic pop
-    }
-    return dict;
-}
-/**
- 判断类是否实现了某个类方法.
- */
-+(id)isRespondsToSelector:(SEL)selector forClass:(Class)cla{
-    id obj = nil;
-    if([cla respondsToSelector:selector]){
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        obj = [cla performSelector:selector];
-#pragma clang diagnostic pop
-    }
-    return obj;
-}
+
 
 +(BOOL)getBoolWithKey:(NSString*)key{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

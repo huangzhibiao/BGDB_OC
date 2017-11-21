@@ -29,6 +29,7 @@
 @property (nonatomic, copy) NSString * BGUpdateTime;
 //@property(nonatomic,strong)UIImage* image;
 @property(nonatomic,strong)Cat* cat;
+@property(nonatomic,strong)NSMutableArray* cats;
 @end
 
 @interface People : father

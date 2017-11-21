@@ -39,4 +39,10 @@
 //    return @[@"name"];
 //}
 
+/**
+ 设置不需要存储的属性
+ */
+//+(NSArray *)bg_ignoreKeys{
+//    return @[@"name",@"age"];
+//}
 @end

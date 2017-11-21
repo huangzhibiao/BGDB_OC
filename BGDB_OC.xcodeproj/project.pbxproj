@@ -259,7 +259,7 @@
 				TargetAttributes = {
 					D76D62571E86095600DB7678 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = P2BR552UD7;
+						DevelopmentTeam = XYBK7B7U6R;
 						ProvisioningStyle = Automatic;
 					};
 					D76D62701E86095600DB7678 = {
@@ -483,7 +483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = P2BR552UD7;
+				DEVELOPMENT_TEAM = XYBK7B7U6R;
 				INFOPLIST_FILE = BGDB_OC/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huangzhibiao.BGDB-OC";
@@ -495,7 +495,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = P2BR552UD7;
+				DEVELOPMENT_TEAM = XYBK7B7U6R;
 				INFOPLIST_FILE = BGDB_OC/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huangzhibiao.BGDB-OC";
