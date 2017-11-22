@@ -457,7 +457,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)insert:(id)object ignoredKeys:(NSArray* const)ignoredKeys{
-    NSAssert(ignoredKeys,@"数组不能为空!");
+    //NSAssert(ignoredKeys,@"数组不能为空!");
     dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
     BOOL result = YES;
     @autoreleasepool {
@@ -750,7 +750,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 }
 
 +(BOOL)updateObj:(id)object ignoredKeys:(NSArray* const)ignoredKeys where:(NSString*)where{
-    NSAssert(ignoredKeys,@"数组不能为空!");
+    //NSAssert(ignoredKeys,@"数组不能为空!");
     dispatch_semaphore_wait([BGSqlite shareInstance].BG_Semaphore, DISPATCH_TIME_FOREVER);
     BOOL result = NO;
     @autoreleasepool {
