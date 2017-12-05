@@ -216,7 +216,7 @@ static NSSet *foundationClasses_;
         for(int i = 0; i < numIvars; i++) {
             Ivar thisIvar = vars[i];
             NSString* key = [NSString stringWithUTF8String:ivar_getName(thisIvar)];//获取成员变量的名
-            if ([key containsString:@"_"]) {
+            if ([key hasPrefix:@"_"]) {
                 key = [key substringFromIndex:1];
             }
             NSString* properType = [NSString stringWithUTF8String:ivar_getTypeEncoding(thisIvar)];
@@ -250,7 +250,7 @@ static NSSet *foundationClasses_;
         for(int i = 0; i < numIvars; i++) {
             Ivar thisIvar = vars[i];
             NSString* key = [NSString stringWithUTF8String:ivar_getName(thisIvar)];//获取成员变量的名
-            if ([key containsString:@"_"]) {
+            if ([key hasPrefix:@"_"]) {
                 key = [key substringFromIndex:1];
             }
             NSString* properType = [NSString stringWithUTF8String:ivar_getTypeEncoding(thisIvar)];

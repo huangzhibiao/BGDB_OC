@@ -501,22 +501,39 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
 +(BOOL)insertOrUpdate:(id)object ignoredKeys:(NSArray* const)ignoredKeys{
     NSArray* uniqueKeys = [BGTool executeSelector:bg_uniqueKeysSelector modelClass:[object class]];
     if(uniqueKeys.count) {
-        NSString* uniqueKey = uniqueKeys.firstObject;
-        id value = [object valueForKey:uniqueKey];
-        NSString* where;
-        if([value isKindOfClass:[NSString class]]){
-            where = [NSString stringWithFormat:@"where %@='%@'",uniqueKey,value];
-        }else{
-            where = [NSString stringWithFormat:@"where %@=%@",uniqueKey,value];
-        }
+        
+        NSMutableString* where = [NSMutableString new];
+        if(uniqueKeys.count > 1){
+            [where appendString:@"where"];
+            [uniqueKeys enumerateObjectsUsingBlock:^(NSString*  _Nonnull uniqueKey, NSUInteger idx, BOOL * _Nonnull stop) {
+                id uniqueKeyVlaue = [self valueForKey:uniqueKey];
+                if(idx < (uniqueKeys.count-1)){
+                    [where appendFormat:@" %@=%@ or",uniqueKey,uniqueKeyVlaue];
+                }else{
+                    [where appendFormat:@" %@=%@",uniqueKey,uniqueKeyVlaue];
+                }
+            }];
+        }else if(uniqueKeys.count == 1){
+            NSString* uniqueKey = [uniqueKeys firstObject];
+            id uniqueKeyVlaue = [self valueForKey:uniqueKey];
+            [where appendFormat:@"where %@=%@",uniqueKey,uniqueKeyVlaue];
+        }else;
+        
         NSArray* querys = [self queryWithClass:[object class] where:where];
         if(querys.count){
             return [self updateObj:object ignoredKeys:ignoredKeys where:where];
         }else{
             return [self insert:object ignoredKeys:ignoredKeys];
         }
+        
     }else{
-        return [self insert:object ignoredKeys:ignoredKeys];
+        id bg_id = [object valueForKey:BGPrimaryKey];
+        if (bg_id == nil) {
+            return [self insert:object ignoredKeys:ignoredKeys];
+        }else{
+            NSString* where = [NSString stringWithFormat:@"where %@=%@",BGPrimaryKey,bg_id];
+            return [self updateObj:object ignoredKeys:ignoredKeys where:where];
+        }
     }
 }
 

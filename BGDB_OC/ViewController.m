@@ -112,13 +112,13 @@
      */
 //    NSInteger sum = [People bg_sqliteMethodWithType:bg_sum key:@"dog->age" where:@"where dog->age > 1"];
 //    NSLog(@"----sum = %ld",sum);
-    
+
     /**
      查询全部.
      */
     NSArray* pAll = [People bg_findAll];
     for(People* p in pAll){
-        NSLog(@"主键ID = %@",p.ID);
+        NSLog(@"主键bg_id = %@",p.bg_id);
     }
     People* lastOne = pAll.lastObject;
     _imageView.image = lastOne.array.lastObject;

@@ -21,7 +21,7 @@
 #define SqlBlob @"blob" //数据库的二进制类型
 
 #define BG @""
-#define BGPrimaryKey @"ID"
+#define BGPrimaryKey @"bg_id"
 //#define BGCreateTime @"createTime"
 //#define BGUpdateTime @"updateTime"
 

@@ -43,7 +43,7 @@
 @end
 
 @interface NSObject (BGModel)<BGProtocol>
-@property(nonatomic,strong)NSNumber* ID;//本库自带的自动增长主键.
+@property(nonatomic,strong)NSNumber* bg_id;//本库自带的自动增长主键.
 /**
  为了方便开发者，特此加入以下两个字段属性供开发者做参考.(自动记录数据的存入时间和更新时间)
  @createTime 数据创建时间(即存入数据库的时间).
@@ -69,7 +69,8 @@ extern void bg_setSqliteDirectory(NSString* directory);
 
 /**
  存储.
- 当有'唯一约束'时使用此API存储会更方便些,此API会自动判断如果同一约束数据已存在则更新,没有则存储.
+ 当"唯一约束"或"主键"存在时，此接口会更新旧数据,没有则存储新数据.
+ 提示：“唯一约束”优先级高于"主键".
  */
 -(BOOL)bg_saveOrUpdate;
 
