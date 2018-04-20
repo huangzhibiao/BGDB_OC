@@ -7,7 +7,7 @@ BGFMDB是在FMDB的基础上进行封装,由于多了中间一层的转化,所�
 ### Podfile
 platform :ios, '8.0'   
 target '工程名称' do   
-pod ‘BGDB_OC’, '~> 1.6’   
+pod ‘BGDB_OC’, '~> 1.9’   
 end
 ## 手动导入
 1.直接下载库源码   
@@ -15,10 +15,10 @@ end
 ## 导入头文件
 ```Objective-C
 /**
-只要在自己的类中导入了NSObject+BGModel.h这个头文件,本类就具有了存储功能.
+只要在自己的类中导入了BGDB.h这个头文件,本类就具有了存储功能.
 */
 #import <Foundation/Foundation.h>
-#import "NSObject+BGModel.h"
+#import "BGDB.h"
 ```
 ## 主键
 ```Objective-C
