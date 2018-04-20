@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "BGDB_OC"
-  s.version      = "1.7"
+  s.version      = "1.9"
   s.summary      = "简约时尚强憾版存储框架,完美支持iOS大部分类型数据的存储,同时带有 字典转模型 功能模块."
 
   # This description is used to generate tags and improve search results.

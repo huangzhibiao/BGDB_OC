@@ -43,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		074935B61F1DF6CB00A5E51F /* BGSqliteConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BGSqliteConfig.h; sourceTree = "<group>"; };
+		077FCE071FD8EB060087932B /* BGDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BGDB.h; sourceTree = "<group>"; };
 		D76D62581E86095600DB7678 /* BGDB_OC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BGDB_OC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76D625C1E86095600DB7678 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D76D625E1E86095600DB7678 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -180,6 +181,7 @@
 				D76D62A11E86436500DB7678 /* NSObject+BGModel.h */,
 				D76D62A21E86436500DB7678 /* NSObject+BGModel.m */,
 				074935B61F1DF6CB00A5E51F /* BGSqliteConfig.h */,
+				077FCE071FD8EB060087932B /* BGDB.h */,
 			);
 			path = BGDB;
 			sourceTree = "<group>";

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "NSObject+BGModel.h"
+#import "BGDB.h"
 
 @interface father : NSObject
 @property(nonatomic,copy)NSString* aId;
