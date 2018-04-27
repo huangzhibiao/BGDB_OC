@@ -107,6 +107,10 @@ typedef void (^BGClassesEnumeration)(Class c, BOOL *stop);
  */
 +(id)executeSelector:(SEL)selector modelClass:(Class)model_class;
 /**
+ 封装数据库判断值
+ */
++(id)bg_sqlValue:(id)value;
+/**
  NSUserDefaults封装使用函数.
  */
 +(BOOL)getBoolWithKey:(NSString*)key;

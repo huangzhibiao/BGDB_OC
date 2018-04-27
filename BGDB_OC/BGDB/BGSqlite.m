@@ -507,6 +507,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
             [where appendString:@"where"];
             [uniqueKeys enumerateObjectsUsingBlock:^(NSString*  _Nonnull uniqueKey, NSUInteger idx, BOOL * _Nonnull stop) {
                 id uniqueKeyVlaue = [object valueForKey:uniqueKey];
+                uniqueKeyVlaue = [BGTool bg_sqlValue:uniqueKeyVlaue];
                 if(idx < (uniqueKeys.count-1)){
                     [where appendFormat:@" %@=%@ or",uniqueKey,uniqueKeyVlaue];
                 }else{
@@ -516,6 +517,7 @@ int BGDBExecuteBulkSQLCallback(void *theBlockAsVoid, int columns, char **values,
         }else if(uniqueKeys.count == 1){
             NSString* uniqueKey = [uniqueKeys firstObject];
             id uniqueKeyVlaue = [object valueForKey:uniqueKey];
+            uniqueKeyVlaue = [BGTool bg_sqlValue:uniqueKeyVlaue];
             [where appendFormat:@"where %@=%@",uniqueKey,uniqueKeyVlaue];
         }else;
         

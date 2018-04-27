@@ -908,6 +908,17 @@ static NSSet *foundationClasses_;
     return arrM;
 }
 
+/**
+ 封装数据库判断值
+ */
++(id)bg_sqlValue:(id)value{
+    if(value){
+        if([value isKindOfClass:[NSString class]]){
+            value = [NSString stringWithFormat:@"'%@'",value];
+        }
+    }
+    return value;
+}
 
 +(BOOL)getBoolWithKey:(NSString*)key{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
